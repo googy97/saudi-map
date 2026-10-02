@@ -24,6 +24,7 @@
         }
 
         body {
+            margin: 0;
             background: #0f5132;
             font-family: Arial, sans-serif;
             overflow: hidden;
@@ -33,6 +34,7 @@
             width: 100%;
             height: 100vh;
             background: #0f5132;
+
             display: flex;
             align-items: center;
             justify-content: center;
@@ -40,8 +42,10 @@
 
         .title {
             position: absolute;
+
             top: 20px;
             right: 20px;
+
             z-index: 10;
 
             background: white;
@@ -54,18 +58,21 @@
             font-size: 21px;
             font-weight: bold;
 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         .saudi {
-            width: 70%;
+            width: 75%;
             max-width: 850px;
+
             height: auto;
 
             fill: white;
 
             stroke: #174a3b;
-            stroke-width: 2;
+            stroke-width: 1.8;
+
+            stroke-linejoin: round;
 
             filter:
                 drop-shadow(0 8px 15px rgba(0,0,0,0.25));
@@ -83,10 +90,6 @@
 
 <body>
 
-    <div class="title">
-        🇸🇦 خريطة السعودية
-    </div>
-
     <div id="map">
 
         <div class="loading">
@@ -100,102 +103,105 @@
 
         const map = document.getElementById("map");
 
-        /*
-         * نحمل حدود السعودية فقط
-         */
-        fetch(
-            "https://raw.githubusercontent.com/glynnbird/countriesgeojson/master/saudi%20arabia.geojson"
-        )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-                throw new Error("لم يتم تحميل الخريطة");
-            }
-
-            return response.json();
-
-        })
-
-        .then(function(data) {
-
-            const coordinates =
-                data.features[0].geometry.coordinates[0];
-
-            let minX = Infinity;
-            let maxX = -Infinity;
-
-            let minY = Infinity;
-            let maxY = -Infinity;
+        const saudiURL =
+            "https://raw.githubusercontent.com/glynnbird/countriesgeojson/master/saudi%20arabia.geojson";
 
 
-            coordinates.forEach(function(point) {
+        fetch(saudiURL)
 
-                const x = point[0];
-                const y = point[1];
+            .then(function(response) {
 
-                if (x < minX) minX = x;
-                if (x > maxX) maxX = x;
+                if (!response.ok) {
+                    throw new Error("لم يتم تحميل الملف");
+                }
 
-                if (y < minY) minY = y;
-                if (y > maxY) maxY = y;
+                return response.json();
+
+            })
+
+            .then(function(data) {
+
+                // الملف عبارة عن Feature مباشرة
+                const coordinates =
+                    data.geometry.coordinates[0];
+
+
+                let minX = Infinity;
+                let maxX = -Infinity;
+
+                let minY = Infinity;
+                let maxY = -Infinity;
+
+
+                coordinates.forEach(function(point) {
+
+                    const x = point[0];
+                    const y = point[1];
+
+                    if (x < minX) minX = x;
+                    if (x > maxX) maxX = x;
+
+                    if (y < minY) minY = y;
+                    if (y > maxY) maxY = y;
+
+                });
+
+
+                const width = maxX - minX;
+                const height = maxY - minY;
+
+
+                const points = coordinates.map(function(point) {
+
+                    const x =
+                        ((point[0] - minX) / width) * 100;
+
+
+                    const y =
+                        100 -
+                        ((point[1] - minY) / height) * 100;
+
+
+                    return x + "," + y;
+
+                });
+
+
+                map.innerHTML = `
+
+                    <div class="title">
+                        🇸🇦 خريطة السعودية
+                    </div>
+
+                    <svg
+                        class="saudi"
+                        viewBox="0 0 100 100"
+                        preserveAspectRatio="xMidYMid meet"
+                    >
+
+                        <polygon
+                            points="${points.join(" ")}"
+                        ></polygon>
+
+                    </svg>
+
+                `;
+
+            })
+
+            .catch(function(error) {
+
+                console.error(error);
+
+                map.innerHTML = `
+
+                    <div class="loading">
+                        حدث خطأ في تحميل خريطة السعودية 🇸🇦
+                    </div>
+
+                `;
 
             });
-
-
-            const width = maxX - minX;
-            const height = maxY - minY;
-
-
-            const points = coordinates.map(function(point) {
-
-                const x =
-                    ((point[0] - minX) / width) * 100;
-
-                const y =
-                    100 -
-                    ((point[1] - minY) / height) * 100;
-
-                return x + "," + y;
-
-            });
-
-
-            map.innerHTML = `
-
-                <div class="title">
-                    🇸🇦 خريطة السعودية
-                </div>
-
-                <svg
-                    class="saudi"
-                    viewBox="0 0 100 100"
-                    preserveAspectRatio="xMidYMid meet"
-                >
-
-                    <polygon
-                        points="${points.join(" ")}"
-                    ></polygon>
-
-                </svg>
-
-            `;
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            map.innerHTML = `
-
-                <div class="loading">
-                    حدث خطأ في تحميل خريطة السعودية 🇸🇦
-                </div>
-
-            `;
-
-        });
 
     </script>
 
