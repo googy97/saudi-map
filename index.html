@@ -1,1 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>خريطة السعودية</title>
+
+    <!-- Leaflet -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7f9;
+        }
+
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+
+        .title-box {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 1000;
+
+            background: white;
+            padding: 12px 18px;
+
+            border-radius: 14px;
+
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+
+            font-size: 20px;
+            font-weight: bold;
+            color: #174a3b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="title-box">
+        🇸🇦 خريطة السعودية
+    </div>
+
+    <div id="map"></div>
+
+    <!-- Leaflet -->
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
+
+    <script>
+
+        // إنشاء الخريطة
+        const map = L.map("map").setView(
+            [24.0, 45.0],
+            5
+        );
+
+        // خريطة الشوارع
+        L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                maxZoom: 19,
+                attribution:
+                    '&copy; OpenStreetMap contributors'
+            }
+        ).addTo(map);
+
+    </script>
+
+</body>
+</html>
